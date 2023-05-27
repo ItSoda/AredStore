@@ -3,7 +3,6 @@ from products.models import Product, ProductCategory, Basket
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
-
 def index(request):
     context = {
         'title' : 'Red Store', 
@@ -45,3 +44,4 @@ def basket_remove(request, basket_id):
     basket = Basket.objects.get(id=basket_id)
     basket.delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
+

@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import User
+from orders.models import Order
 
 # Create your models here.
 class ProductCategory(models.Model):
