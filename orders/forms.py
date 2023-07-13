@@ -1,12 +1,21 @@
-from django.contrib.auth.forms import UserChangeForm
 from django import forms
+
 from orders.models import Order
 
-class OrderCreateForm(UserChangeForm):
+
+class OrderForm(forms.ModelForm):
+
+    # style forms
+    first_name = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control', 'placeholder': 'Иван'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control', 'placeholder': 'Иванов'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control', 'placeholder': 'you@example.com'}))
     address = forms.CharField(widget=forms.TextInput(attrs={
-        'class' : "form-control", 'placeholder' : "Россия, Москва, ул. Мира, дом 6"
-    }))
+        'class': 'form-control', 'placeholder': 'Россия, Москва, ул. Мира, дом 6'}))
+# register fields forms
 
     class Meta:
         model = Order
-        fields = ('address',)
+        fields = ('first_name', 'last_name', 'email', 'address',)
