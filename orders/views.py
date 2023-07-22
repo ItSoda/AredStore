@@ -78,7 +78,7 @@ class OrderCreateView(TitleMixin, CreateView):
         form.instance.initiator = self.request.user
         return super(OrderCreateView, self).form_valid(form)
 
-endpoint_secret = 'whsec_e265a5dc8ec33f5a5e2e3b631213fe357363777464c9beba8bc102b82f1aeba3'
+
 
 @csrf_exempt
 def stripe_webhook_view(request):
@@ -88,7 +88,7 @@ def stripe_webhook_view(request):
 
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         )
     except ValueError:
         # Invalid payload
@@ -99,16 +99,19 @@ def stripe_webhook_view(request):
 
     # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-
+        session = stripe.checkout.Session.retrieve(
+            event['data']['object']['id'],
+            expand=['line_items'],
+        )
+        line_items = session
         # Fulfill the purchase...
-        fulfill_order(session)
+        fulfill_order(line_items)
 
     # Passed signature verification
     return HttpResponse(status=200)
 
 
-def fulfill_order(session):
-    order_id = int(session.metadata.order_id)
+def fulfill_order(line_items):
+    order_id = int(line_items.metadata.order_id)
     order = Order.objects.get(id=order_id)
     order.update_after_payment()
