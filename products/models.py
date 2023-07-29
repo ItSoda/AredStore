@@ -1,11 +1,13 @@
-from typing import Iterable, Optional
-import stripe
-from django.db import models
+
+
 from django.conf import settings
+from django.db import models
+
+import stripe
 from users.models import User
 
-
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 # Create your models here.
 class ProductCategory(models.Model):

@@ -1,22 +1,22 @@
 from http import HTTPStatus
-from typing import Any, Dict
-from django.db.models.query import QuerySet
+from typing import Any
 
-import stripe
 from django.conf import settings
+from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
 
+import stripe
 from common.views import TitleMixin
 from orders.forms import OrderForm
-from products.models import Basket
 from orders.models import Order
+from products.models import Basket
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -30,6 +30,7 @@ class SuccessTemplateView(TitleMixin, TemplateView):
     template_name = 'orders/success.html'
     title = 'Red Store - Success'
 
+
 class OrderListView(TitleMixin, ListView):
     template_name = 'orders/orders.html'
     title = 'Red Store - Заказы'
@@ -39,7 +40,8 @@ class OrderListView(TitleMixin, ListView):
     def get_queryset(self):
         queryset = super(OrderListView, self).get_queryset()
         return queryset.filter(initiator=self.request.user)
-    
+
+
 class OrderDescView(DetailView):
     template_name = 'orders/order.html'
     model = Order
@@ -54,7 +56,6 @@ class OrderDescView(DetailView):
         return queryset.filter(initiator=self.request.user)
 
 
-
 class OrderCreateView(TitleMixin, CreateView):
     template_name = 'orders/order-create.html'
     form_class = OrderForm
@@ -64,7 +65,6 @@ class OrderCreateView(TitleMixin, CreateView):
     def post(self, request, *args, **kwargs):
         super(OrderCreateView, self).post(request, *args, **kwargs)
         baskets = Basket.objects.filter(user=self.request.user)
-       
         checkout_session = stripe.checkout.Session.create(
             line_items=baskets.stripe_products(),
             metadata={'order_id': self.object.id},
@@ -77,7 +77,6 @@ class OrderCreateView(TitleMixin, CreateView):
     def form_valid(self, form):
         form.instance.initiator = self.request.user
         return super(OrderCreateView, self).form_valid(form)
-
 
 
 @csrf_exempt

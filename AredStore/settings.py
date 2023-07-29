@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import environ
-
 from pathlib import Path
+
+import environ
 
 env = environ.Env(
     # set casting, default value
@@ -76,6 +76,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.vk',
+    'allauth.socialaccount.providers.google',
+
 
     "products",
     "users",
@@ -122,7 +124,7 @@ INTERNAL_IPS = [
     'localhost',
 ]
 
-# Redis 
+# Redis
 REDIS_HOST = env('REDIS_HOST')
 REDIS_PORT = env('REDIS_PORT')
 
@@ -142,7 +144,7 @@ CACHES = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',# -> postgresql/mysql
+        'ENGINE': 'django.db.backends.mysql',  # -> postgresql/mysql
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASSWORD'),
@@ -210,14 +212,14 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # SENDING EMAIL
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-else:
-    EMAIL_HOST = env('EMAIL_HOST')
-    EMAIL_PORT = env('EMAIL_PORT')
-    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_SSL = env('EMAIL_USE_SSL')
+# if DEBUG:
+#     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# else:
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = env('EMAIL_USE_SSL')
 
 
 # oAuth
@@ -235,15 +237,36 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'user',
             'user:email',
-        ],
+        ]
     }
 }
+if not(DEBUG):
+    SITE_ID = 3
 
+    # Provider specific settings
+    SOCIALACCOUNT_PROVIDERS = {
+        'vk': {
+            'SCOPE': [
+                'user',
+                'user:email',
+            ],
+        }
+    }
 
-# celery
+    SITE_ID = 2
+
+    # # Provider specific settings
+    SOCIALACCOUNT_PROVIDERS = {
+        'google': {
+            'SCOPE': [
+                'profile',
+                'email',
+            ]
+        }
+    }
 
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
-CELERY_RESULT_BACKEND =f'redis://{REDIS_HOST}:{REDIS_PORT}'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
 # Stripe
 
