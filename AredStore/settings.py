@@ -71,6 +71,9 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_celery_results',
 
+    'rest_framework',
+    'rest_framework.authtoken',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -82,6 +85,8 @@ INSTALLED_APPS = [
     "products",
     "users",
     "orders",
+    "api",
+
 ]
 
 MIDDLEWARE = [
@@ -240,7 +245,7 @@ SOCIALACCOUNT_PROVIDERS = {
         ]
     }
 }
-if not(DEBUG):
+if not DEBUG:
     SITE_ID = 3
 
     # Provider specific settings
@@ -273,3 +278,12 @@ CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 3,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
